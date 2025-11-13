@@ -1,0 +1,1 @@
+{"optimal_threshold": 0.024667557328939438, "feature_columns": ["absolute_magnitude", "eccentricity", "semi_major_axis", "inclination", "min_orbit_intersection", "jupiter_tisserand_invariant", "mean_anomaly", "arg_of_perihelion", "relative_velocity_kms"]}

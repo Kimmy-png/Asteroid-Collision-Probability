@@ -1,0 +1,104 @@
+import requests
+import pandas as pd
+import time
+import json
+
+# Configuration
+API_KEY = 'Demo_api'  # Replace with your real API key for bulk downloading
+BASE_URL = "https://api.nasa.gov/neo/rest/v1/neo/browse"
+
+def fetch_asteroid_data(num_pages=5):
+    """
+    Fetches asteroid data from NASA NeoWs API.
+    
+    Args:
+        num_pages (int): Number of 20-item pages to fetch. 
+                         (5 pages = 100 asteroids for testing)
+    """
+    asteroids_list = []
+    page = 0
+    url = f"{BASE_URL}?api_key={API_KEY}"
+
+    while page < num_pages:
+        try:
+            response = requests.get(url)
+            
+            if response.status_code == 429:
+                print("Rate limit hit. Sleeping for 60 seconds...")
+                time.sleep(60)
+                continue
+                
+            if response.status_code != 200:
+                print(f"Error: {response.status_code}")
+                break
+
+            data = response.json()
+            neos = data['near_earth_objects']
+
+            for neo in neos:
+
+                neo_id = neo['id']
+                name = neo['name']
+                hazardous = neo['is_potentially_hazardous_asteroid']
+                absolute_magnitude = neo['absolute_magnitude_h']
+                
+                dia_min = neo['estimated_diameter']['meters']['estimated_diameter_min']
+                dia_max = neo['estimated_diameter']['meters']['estimated_diameter_max']
+                avg_diameter = (dia_min + dia_max) / 2
+
+                orb = neo['orbital_data']
+                
+                orbit_features = {
+                    'id': neo_id,
+                    'name': name,
+                    'absolute_magnitude': absolute_magnitude,
+                    'est_diameter_m': avg_diameter,
+                    'is_hazardous': hazardous,
+                    
+                    'epoch_osculation': orb.get('epoch_osculation'),
+                    'eccentricity': float(orb.get('eccentricity', 0)),
+                    'semi_major_axis': float(orb.get('semi_major_axis', 0)),
+                    'inclination': float(orb.get('inclination', 0)),
+                    
+                    'min_orbit_intersection': float(orb.get('minimum_orbit_intersection', 0)), # MOID
+                    'orbit_uncertainty': orb.get('orbit_uncertainty'),
+                    'jupiter_tisserand_invariant': orb.get('jupiter_tisserand_invariant'),
+                    'mean_anomaly': float(orb.get('mean_anomaly', 0)),
+                    'arg_of_perihelion': float(orb.get('perihelion_argument', 0))
+                }
+                
+                if neo['close_approach_data']:
+                    
+                    vel = neo['close_approach_data'][0]['relative_velocity']['kilometers_per_second']
+                    orbit_features['relative_velocity_kms'] = float(vel)
+                else:
+                    orbit_features['relative_velocity_kms'] = 0.0
+
+                asteroids_list.append(orbit_features)
+            
+            url = data['links'].get('next')
+            if not url:
+                break
+                
+            page += 1
+            
+            time.sleep(1)
+
+        except Exception as e:
+            print(f"CRITICAL ERROR: {e}")
+            break
+
+    return pd.DataFrame(asteroids_list)
+
+if __name__ == "__main__":
+
+    df = fetch_asteroid_data(num_pages=100)
+    
+    filename = "asteroid_orbital_data.csv"
+    df.to_csv(filename, index=False)
+    
+    print(f"\nSaved {len(df)} rows to {filename}")
+    print(df.head())
+    
+    print("\nClass Balance (Hazardous vs Safe):")
+    print(df['is_hazardous'].value_counts(normalize=True))
