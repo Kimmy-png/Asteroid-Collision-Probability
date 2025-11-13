@@ -15,9 +15,9 @@ from backend import (
 st.set_page_config(page_title="Asteroid Collision Probability", page_icon="☄️", layout="wide")
 
 # --- SETUP ---
-MODEL_PATH = 'models/asteroid_model.pkl'
-SCALER_PATH = 'models/data_scaler.pkl'
-METADATA_PATH = 'models/model_metadata.json'
+MODEL_PATH = 'Models/asteroid_model.pkl'
+SCALER_PATH = 'Models/data_scaler.pkl'
+METADATA_PATH = 'Models/model_metadata.json'
 
 @st.cache_resource
 def load_models():
