@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
 import streamlit as st
 import pandas as pd
 import time
@@ -9,7 +12,7 @@ from backend import (
     plot_simulation_viz
 )
 
-st.set_page_config(page_title="Kalkulator Tabrakan Asteroid", page_icon="☄️", layout="wide")
+st.set_page_config(page_title="Asteroid Collision Probability", page_icon="☄️", layout="wide")
 
 # --- SETUP ---
 MODEL_PATH = 'models/asteroid_model.pkl'
@@ -36,7 +39,7 @@ def get_filtered_data(api_key, pages):
     return apply_xgboost_filter(raw_data, model, scaler, metadata)
 
 # --- UI ---
-st.title("☄️ Kalkulator Probabilitas Tabrakan Asteroid")
+st.title("Asteroid Collision Probality")
 st.markdown("Alur Kerja: **1. Filter AI (XGBoost)** → **2. Simulasi Fisika (Monte Carlo)**")
 
 if model is None:
