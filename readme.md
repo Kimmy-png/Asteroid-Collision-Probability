@@ -47,7 +47,7 @@ Asteroid_collision_probability/
 
 Want to see this project in action? Check out the live Streamlit app:
 
-[Launch the Asteroid Collision Probability Calculator]
+[[Launch the Asteroid Collision Probability]](https://asteroid-collision-probability.streamlit.app/)
 
 ---
 
