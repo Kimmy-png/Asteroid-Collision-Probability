@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import pandas as pd
 from typing import Tuple
 
-COLLISION_THRESHOLD_AU = 0.05 
+COLLISION_THRESHOLD_AU = 4.26e-5 
 
 def run_monte_carlo(
     asteroid_details: pd.DataFrame, 
